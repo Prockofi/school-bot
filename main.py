@@ -49,6 +49,14 @@ async def command_start_handler(message: Message) -> None:
                         '3️⃣ Отображать расписание\n\n'
                         'Вы уже зарегистрированы', reply_markup=reply.main)
 
+@dp.message(F.text == 'Прекратить регистрацию')
+async def break_reg(message: Message, state: FSMContext) -> None:
+    await message.answer('Регистрация прекращена', reply_markup=reply.no_reg_main)
+    await message.answer('Вы можете зарегистрироваться в боте,\n'
+                         'либо обратиться за помощью', 
+                         reply_markup=inline.start_0)
+    await state.clear()
+
 #Отслеживание inline callback
 @dp.callback_query(F.data.in_({'reg'}))
 async def callback_reg_handler(call: CallbackQuery, state: FSMContext) -> None:
@@ -121,8 +129,8 @@ async def callback_help_handler(call: CallbackQuery) -> None:
                          'указанное на официальном сайте\nшколы\n\n'
                          '2️⃣ Дублирует сообщение об оценке\n'
                          '- О таком случае сообщите\nадминистратору\n\n'
-                         'Если у вас ещё остались вопросы, вы\n'
-                         'можете обратиться к администратору', reply_markup=inline.help_0)
+                         'Если у вас ещё остались вопросы,\n'
+                         'вы можете обратиться к администратору', reply_markup=inline.help_0)
 
 @dp.callback_query(F.data.in_({'help_input'}))
 async def callback_help_input_handler(call: CallbackQuery, state: FSMContext) -> None:
@@ -131,7 +139,8 @@ async def callback_help_input_handler(call: CallbackQuery, state: FSMContext) ->
 
 @dp.callback_query(F.data.in_({'help_input_yes'}))
 async def callback_help_input_yes_handler(call: CallbackQuery, state: FSMContext, bot: Bot) -> None:
-    await bot.forward_message(chat_id=GROUP_ADMIN, from_chat_id=call.message.chat.id, message_id=call.message.message_id)
+    await bot.send_message(chat_id=GROUP_ADMIN, text=f'<code>{call.message.chat.id}</code> - {call.message.chat.first_name}')
+    await bot.send_message(chat_id=GROUP_ADMIN, text=f'{call.message.text}'[21:])
     await call.message.edit_text('Обращение отправленно')
     await state.clear()
     elements = await users.get_not_empty(call.message.chat.id)
@@ -494,14 +503,6 @@ async def additionally(message: Message) -> None:
         await message.answer('Вы можете удалить свои\n'
                             'данные из бота, либо\n'
                             'обратиться за помощью', reply_markup=inline.additionally)
-
-@dp.message(F.text == 'Прекратить регистрацию')
-async def break_reg(message: Message, state: FSMContext) -> None:
-    await message.answer('Регистрация прекращена', reply_markup=reply.no_reg_main)
-    await message.answer('Вы можете зарегистрироваться в боте,\n'
-                         'либо обратиться за помощью', 
-                         reply_markup=inline.start_0)
-    await state.clear()
 
 #Запуск бота
 async def main() -> None:
