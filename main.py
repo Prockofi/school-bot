@@ -57,6 +57,19 @@ async def break_reg(message: Message, state: FSMContext) -> None:
                          reply_markup=inline.start_0)
     await state.clear()
 
+@dp.message(F.text == '/help')
+async def command_start_handler(message: Message) -> None:
+    await message.answer('Вы можете обратиться к\n'
+                         'админимтратору, либо найти ответы\n'
+                         'на самые популярные вопросы тут:\n\n'
+                         '1️⃣ Не находит школу\n'
+                         '- Попробуйте использовать название,\n'
+                         'указанное на официальном сайте\nшколы\n\n'
+                         '2️⃣ Дублирует сообщение об оценке\n'
+                         '- О таком случае сообщите\nадминистратору\n\n'
+                         'Если у вас ещё остались вопросы,\n'
+                         'вы можете обратиться к администратору', reply_markup=inline.help_0)
+
 #Отслеживание inline callback
 @dp.callback_query(F.data.in_({'reg'}))
 async def callback_reg_handler(call: CallbackQuery, state: FSMContext) -> None:
