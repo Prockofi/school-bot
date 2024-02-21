@@ -4,9 +4,14 @@ import requests, json
 def search_school(name_school: str, url: str) -> str:
     responce = requests.get(f'{url}/webapi/schools/search').json()
     res = []
-    name_school = (name_school.replace('№', '№ ')).split()
+    name_school = name_school.lower()
+    name_school = (name_school.replace('№', '№ '))
+    name_school = (name_school.replace('сош', ' сош '))
+
     while '  ' in name_school:
         name_school = name_school.replace('  ', ' ')
+
+    name_school = name_school.split()
     for word in name_school:
         try: 
             num = int(word)
