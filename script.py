@@ -28,7 +28,6 @@ async def script() -> None:
                         old = '\n' + '\n'.join(old)
                         new = new.replace('\n\n', '\n')
                         old = old.replace('\n\n', '\n')
-                        print(new, old)
                         if len(new) > 10:
                             await bot.send_message(user_id, f'Новые оценки:{new}')
                         if len(old) > 10:
