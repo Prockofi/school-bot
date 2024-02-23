@@ -91,7 +91,7 @@ additionally = InlineKeyboardMarkup(
 reports = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="Итоговые отметки", callback_data='итоги'), 
+            InlineKeyboardButton(text="Итоги", callback_data='итоги'), 
             InlineKeyboardButton(text="Итоги поурочно", callback_data='поурочно 0')
         ]
     ], resize_keyboard=True
@@ -102,6 +102,20 @@ reports1 = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="1 полугодие", callback_data=f'итоги 1 полугодие'),
             InlineKeyboardButton(text="2 полугодие", callback_data=f'итоги 2 полугодие')
+        ],
+        [
+            InlineKeyboardButton(text="Назад", callback_data=f'отчёты')
+        ]
+    ], resize_keyboard=True
+)
+
+reports2 = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="1 чет", callback_data=f'итоги 1 четверть'),
+            InlineKeyboardButton(text="2 чет", callback_data=f'итоги 2 четверть'),
+            InlineKeyboardButton(text="3 чет", callback_data=f'итоги 3 четверть'),
+            InlineKeyboardButton(text="4 чет", callback_data=f'итоги 4 четверть')
         ],
         [
             InlineKeyboardButton(text="Назад", callback_data=f'отчёты')

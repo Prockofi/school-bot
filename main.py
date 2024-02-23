@@ -10,7 +10,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 #Импорт файлов
 from script import script
-from define import define
+from define import define, define_year
 from get_netschool import Lessons
 from KeyBoards import inline, reply
 from config import BOT_TOKEN, GROUP_ADMIN
@@ -226,9 +226,6 @@ async def user_form_search_school(message: Message, state: FSMContext) -> None:
 async def help_form_input(message: Message, state: FSMContext, bot: Bot) -> None:
     await message.answer(f'Отправить обращение:\n{message.text}', reply_markup=inline.help_1)
 
-#
-#
-#
 @dp.callback_query(F.data.in_({'отчёты'}))
 async def callback_reports_message(call: CallbackQuery) -> None:
     elements = await users.get_not_empty(call.message.chat.id)
@@ -237,71 +234,49 @@ async def callback_reports_message(call: CallbackQuery) -> None:
     else:
         await call.message.edit_text('Вы можете выбрать тип отчета', reply_markup=inline.reports)
 
-#
-#
-#
 @dp.callback_query(F.data.in_({'итоги', 'итоги 1 полугодие', 'итоги 2 полугодие', 'итоги 1 четверть', 'итоги 2 четверть', 'итоги 3 четверть', 'итоги 4 четверть'}))
 async def callback_reports2_message(call: CallbackQuery) -> None:
+    #user_id, login, password, num_class, name_school, ver
     elements = await users.get_not_empty(call.message.chat.id)
+    #Начало обработки результатов
     if len(elements) != 6:
         await call.message.answer("Вы не зарегистрированы", reply_markup=inline.start_0)
     else:
-        time = str(datetime.datetime.now().year)+', '+str(datetime.datetime.now().month)+', '+str(datetime.datetime.now().day)
-        s = ''
-        if call.data == 'итоги': 
-            user_id, login, password, num_class, name_school, ver = await users.get_not_empty(call.message.chat.id)
-            s = define(time, num_class)
-        year = (await Lessons.get_year(call.message.chat.id))
-        if ('полугодие' in s) or ('полугодие' in call.data):
-            if s == '':
-                s = str(call.data)[6] + ' полугодие'
-            index = year.find('2024, 1, 10')
-            if s[0] == '1':
-                if index == -1:
-                    index = len(year)
-                year = year[:index]
-            else:
-                year = year[index:]
-            mk = inline.reports1
-        elif ('четверть' in s) or ('четверть' in call.data):
-            if s == '':
-                s = str(call.data)[6] + ' четверть'
-            index1 = year.find('2023, 9, 1'), year.find('2023, 10, 25')
-            index2 = year.find('2023, 11, 7'), year.find('2023, 12, 29')
-            index3 = year.find('2024, 1, 10'), year.find('2024, 2, 22')
-            index4 = year.find('2024, 4, 1'), year.find('2024, 5, 28')
-            if s[0] == '1':
-                year = year[index1[0]:index1[1]]
-            elif s[0] == '2':
-                year = year[index2[0]:index2[1]]
-            elif s[0] == '3':
-                year = year[index3[0]:index3[1]]
-            else:
-                year = year[index4[0]:index4[1]]
-            mk = inline.reports2
-        mark = {}
+        year = await Lessons.get_year(call.message.chat.id)
+        if call.data == 'итоги':
+            x = define(int(elements[3]))
+        else:
+            x = str(call.data)[6:]
+        if int(elements[3]) > 9:
+            kb = inline.reports1
+        else:
+            kb = inline.reports2
+        year = define_year(x, year)
+        marks = {}
         for day in year.split('$'):
-            if len(day) > 10:
-                day = day[day.index(')')+1:]
-                for lesson in day.split('#'):
-                    if lesson[2:] in mark.keys():
-                        if lesson[0] != '6':
-                            mark[lesson[2:]] += lesson[0]
-                    else:
-                        mark[lesson[2:]] = ''
+            try:
+                if len(day) > 10:
+                    day = day[day.index(')')+1:]
+                    for lesson in day.split('#'):
+                        if lesson[2:] in marks.keys():
+                            if lesson[0] != '6':
+                                marks[lesson[2:]] += lesson[0]
+                        else:
+                            marks[lesson[2:]] = ''
+            except:
+                pass
         result = ''
-        for el in mark.keys():
+        for el in marks.keys():
             res = 0
             k = 0
-            
-            if len(mark.get(el)) < 3:
-                res = 'н/а'
-            if mark.get(el) == '':
+            if marks.get(el) == '':
                 res = ''
-            if mark.get(el) != '' and (len(mark.get(el)) >= 3):
-                for i in mark.get(el):
+            elif len(marks.get(el)) >= 3:
+                for i in marks.get(el):
                     res += int(i)
                     k += 1
+            else:
+                res = 'н/а'
             if res != 'н/а' and res != '':
                 if k != 0:
                     res = res / k
@@ -312,46 +287,44 @@ async def callback_reports2_message(call: CallbackQuery) -> None:
             result += '\n' + el + ': ' + str(res)
         if len(result) < 10:
             result = '\n\nНа данный момент нет результатов'
-        if call.message.text != f'📃 Отчет {s}:{result}':
-            await call.message.edit_text(f'📃 Отчет {s}:{result}', reply_markup=mk)
+        if call.message.text != f'📃 Отчет {x}:{result}':
+            await call.message.edit_text(f'📃 Отчет {x}:{result}', reply_markup=kb)
 
 #
 #
 #
 @dp.callback_query()
-async def otchet(call: CallbackQuery) -> None:
+async def callback_otchet(call: CallbackQuery) -> None:
     elements = await users.get_not_empty(call.message.chat.id)
     if len(elements) != 6:
         await call.message.answer("Вы не зарегистрированы", reply_markup=inline.start_0)
     else:
+        year = await Lessons.get_year(call.message.chat.id)
         if 'поурочно' in call.data:
-            year = (await Lessons.get_year(call.message.chat.id))
-            mark = {}
-            for day in year.split('$'):
-                if len(day) > 10:
-                    day = day[day.index(')')+1:]
-                    for lesson in day.split('#'):
-                        mark[lesson[2:]] = ''
+            marks = {}
             for day in year.split('$'):
                 if len(day) > 10:
                     time = day[1:day.index(')')] + ' '
                     day = day[day.index(')')+1:]
                     for lesson in day.split('#'):
-                        if lesson[0] != '6':
-                            mark[lesson[2:]] += lesson[:1] + ' - ' + str(time) + '#'
+                        if lesson[2:] in marks.keys():
+                            if lesson[0] != '6':
+                                marks[lesson[2:]] += lesson[:1] + ' - ' + str(time) + '#'
+                        else:
+                            marks[lesson[2:]] = ''
             i = 0
-            for el in mark.keys():
+            for el in marks.keys():
                 if i == int(call.data[-2:]):
-                    if i+1 == len(mark.keys()):
+                    if i+1 == len(marks.keys()):
                         index0 = i-1
                         index1 = 0
                     elif i == 0:
-                        index0 = len(mark.keys()) - 1
+                        index0 = len(marks.keys()) - 1
                         index1 = i+1
                     else:
                         index0 = i-1
                         index1 = i+1
-                    data = '\n'.join(mark[el].split('#'))
+                    data = '\n'.join(marks[el].split('#'))
                     pourochno = InlineKeyboardMarkup(
                         inline_keyboard=[
                             [
