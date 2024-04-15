@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-main = ReplyKeyboardMarkup(
+start = ReplyKeyboardMarkup(
     keyboard=[[
         KeyboardButton(text="Отчёты"), 
         KeyboardButton(text="Дневник")
@@ -11,7 +11,7 @@ main = ReplyKeyboardMarkup(
     ], resize_keyboard=True
 )
 
-no_reg_main = ReplyKeyboardMarkup(
+start_no_reg = ReplyKeyboardMarkup(
     keyboard=[
     [
         KeyboardButton(text="Дополнительно")
