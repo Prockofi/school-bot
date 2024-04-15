@@ -1,13 +1,13 @@
 import datetime
 
-now_year = ['2023', '2024']
+now_year = ["2023", "2024"]
 periods = [
-    {'1 четверть':f'{now_year[0]}, 9, 1:{now_year[0]}, 10, 27', 
-    '2 четверть':f'{now_year[0]}, 11, 6:{now_year[0]}, 12, 29', 
-    '3 четверть':f'{now_year[1]}, 1, 9:{now_year[1]}, 3, 22', 
-    '4 четверть':f'{now_year[1]}, 4, 1:{now_year[1]}, 5, 28'},
-    {'1 полугодие':f'{now_year[0]}, 9, 1:{now_year[0]}, 12, 29', 
-    '2 полугодие':f'{now_year[1]}, 1, 9:{now_year[1]}, 5, 28'}
+    {"1 четверть":f"{now_year[0]}, 9, 1:{now_year[0]}, 10, 27", 
+    "2 четверть":f"{now_year[0]}, 10, 28:{now_year[0]}, 12, 29", 
+    "3 четверть":f"{now_year[1]}, 1, 1:{now_year[1]}, 3, 22", 
+    "4 четверть":f"{now_year[1]}, 3, 23:{now_year[1]}, 5, 28"},
+    {"1 полугодие":f"{now_year[0]}, 9, 1:{now_year[0]}, 12, 29", 
+    "2 полугодие":f"{now_year[1]}, 1, 1:{now_year[1]}, 5, 28"}
 ]
 
 #
@@ -32,9 +32,10 @@ def define(num_class: int) -> str:
 #
 #
 def define_year(period: str, year: str) -> str:
-    if 'полугодие' in period:
+    k = 0
+    if "полугодие" in period:
         if period[0] == '1':
-            start = '$(' + (periods[1].get('1 полугодие').split(':')[1]) + ')'
+            start = "$(" + (periods[1].get("1 полугодие").split(':')[1]) + ')'
             end = 0
             index_start = year.find(start)
             while index_start == -1 and k < 30:
@@ -43,7 +44,7 @@ def define_year(period: str, year: str) -> str:
                 k += 1
             return year[:index_start]
         else:
-            start = '$(' + (periods[1].get('2 полугодие').split(':')[0]) + ')'
+            start = "$(" + (periods[1].get("2 полугодие").split(':')[0]) + ')'
             end = 0
             index_start = year.find(start)
             while index_start == -1 and k < 30:
@@ -52,9 +53,8 @@ def define_year(period: str, year: str) -> str:
                 k += 1
             return year[index_start:]
     else:
-        k = 0
         if period[0] == '1':
-            start = '$(' + (periods[0].get('1 четверть').split(':')[1]) + ')'
+            start = "$(" + (periods[0].get("1 четверть").split(':')[1]) + ')'
             end = 0
             index_start = year.find(start)
             while index_start == -1 and k < 30:
@@ -63,8 +63,8 @@ def define_year(period: str, year: str) -> str:
                 k += 1
             return year[:index_start]
         elif period[0] == '2':
-            start = '$(' + (periods[0].get('2 четверть').split(':')[0]) + ')'
-            end = '$(' + (periods[0].get('2 четверть').split(':')[1]) + ')'
+            start = "$(" + (periods[0].get("2 четверть").split(':')[0]) + ')'
+            end = "$(" + (periods[0].get("2 четверть").split(':')[1]) + ')'
             index_start = year.find(start)
             while index_start == -1 and k < 30:
                 start, end = redefine_year(start, end, '>')
@@ -77,8 +77,8 @@ def define_year(period: str, year: str) -> str:
                 k += 1
             return year[index_start:index_end]
         elif period[0] == '3':
-            start = '$(' + (periods[0].get('3 четверть').split(':')[0]) + ')'
-            end = '$(' + (periods[0].get('3 четверть').split(':')[1]) + ')'
+            start = "$(" + (periods[0].get("3 четверть").split(':')[0]) + ')'
+            end = "$(" + (periods[0].get("3 четверть").split(':')[1]) + ')'
             index_start = year.find(start)
             while index_start == -1 and k < 30:
                 start, end = redefine_year(start, end, '>')
