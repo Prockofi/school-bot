@@ -160,6 +160,7 @@ async def callback_user_form_num_class_handler(call: CallbackQuery, state: FSMCo
 async def callback_user_form_search_school_no_handler(call: CallbackQuery, state: FSMContext) -> None:
     REG = len(await users.get_not_empty(call.message.chat.id)) == 6
     if not REG:
+        await call.message.answer("Попробуйте использовать название\nуказанное на официальном сайте\nшколы")
         await call.message.answer("Введите название школы")
         await state.set_state(UserForm.search_school)
 
